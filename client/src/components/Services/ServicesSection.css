@@ -361,6 +361,7 @@
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  margin-left: -10px;
 }
 
 .ss-pricing-table {

@@ -1,4 +1,3 @@
-// Middleware для логирования запросов
 const logger = (req, res, next) => {
   console.log(`${new Date().toISOString()} ${req.method} ${req.url}`);
   console.log('Body:', req.body);

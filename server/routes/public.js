@@ -2,10 +2,9 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/database');
 
-// Главная страница API
 router.get('/', (req, res) => {
   res.json({ 
-    message: '✅ LinguaPro API работает!',
+    message: 'LinguaPro API работает!',
     version: '1.0.0',
     endpoints: {
       public: {
@@ -50,7 +49,7 @@ router.get('/api/check-db', async (req, res) => {
       reviews: reviewsList
     });
   } catch (error) {
-    console.error('❌ Ошибка проверки БД:', error);
+    console.error('Ошибка проверки БД:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка подключения к БД',
@@ -61,7 +60,7 @@ router.get('/api/check-db', async (req, res) => {
 
 // Отправка заявки
 router.post('/api/bookings', async (req, res) => {
-  console.log('📥 Получена новая заявка:', req.body);
+  console.log('Получена новая заявка:', req.body);
   
   try {
     const { 
@@ -120,7 +119,7 @@ router.post('/api/bookings', async (req, res) => {
       ]
     );
 
-    console.log(`✅ Заявка #${result.insertId} сохранена`);
+    console.log(`Заявка #${result.insertId} сохранена`);
     
     res.status(201).json({
       success: true,
@@ -132,7 +131,7 @@ router.post('/api/bookings', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка при сохранении заявки:', error);
+    console.error('Ошибка при сохранении заявки:', error);
     
     // Детальный лог ошибок MySQL
     if (error.code === 'ER_NO_SUCH_TABLE') {
@@ -156,7 +155,7 @@ router.post('/api/bookings', async (req, res) => {
 // Получение опубликованных отзывов
 router.get('/api/reviews', async (req, res) => {
   try {
-    console.log('📨 Запрос на получение отзывов получен');
+    console.log('Запрос на получение отзывов получен');
     
     const [reviews] = await pool.execute(
       `SELECT id, name, position, text, rating, status, created_at 
@@ -166,7 +165,7 @@ router.get('/api/reviews', async (req, res) => {
        LIMIT 50`
     );
 
-    console.log(`✅ Найдено ${reviews.length} одобренных отзывов`);
+    console.log(`Найдено ${reviews.length} одобренных отзывов`);
     
     // Если нет approved отзывов, показываем pending для отладки
     if (reviews.length === 0) {
@@ -193,7 +192,7 @@ router.get('/api/reviews', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка при получении отзывов:', error);
+    console.error('Ошибка при получении отзывов:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера при получении отзывов',
@@ -205,7 +204,7 @@ router.get('/api/reviews', async (req, res) => {
 // Отправка отзыва
 router.post('/api/reviews', async (req, res) => {
   try {
-    console.log('📝 Получен новый отзыв:', req.body);
+    console.log('Получен новый отзыв:', req.body);
     
     const { name, position, text, rating } = req.body;
 
@@ -228,7 +227,7 @@ router.post('/api/reviews', async (req, res) => {
       [name.trim(), position?.trim() || null, text.trim(), parseInt(rating)]
     );
 
-    console.log(`✅ Отзыв #${result.insertId} сохранен`);
+    console.log(`Отзыв #${result.insertId} сохранен`);
     
     res.status(201).json({
       success: true,
@@ -237,7 +236,7 @@ router.post('/api/reviews', async (req, res) => {
     });
 
   } catch (error) {
-    console.error('❌ Ошибка при отправке отзыва:', error);
+    console.error('Ошибка при отправке отзыва:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера при сохранении отзыва',

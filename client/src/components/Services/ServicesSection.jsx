@@ -63,9 +63,7 @@ const ServicesSection = () => {
           </div>
         </div>
 
-        {/* Остальной код без изменений */}
         <div className="ss-languages-grid">
-          {/* Испанский */}
           <div className="ss-language-card">
             <div className="ss-card-header">
               <div className="ss-language-icon-wrapper">

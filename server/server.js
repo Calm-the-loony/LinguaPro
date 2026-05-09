@@ -8,23 +8,17 @@ const { logger } = require('./middleware/logger');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Настройка CORS
+// Настройка CORS - разрешает запросы с любых доменов
 app.use(cors({
-  origin: ['http://localhost:3000', 'http://localhost:5000', 'http://127.0.0.1:3000', 'http://tutor-site161.ru', 'https://tutor-site161.ru'],
+  origin: true,  //работает с любым адресом, а то до этого были четко прописаны
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 app.use(express.json());
-
-// Middleware для логирования запросов
 app.use(logger);
-
-// Подключение роутов
 app.use('/', routes);
-
-// Обработка 404
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -32,9 +26,8 @@ app.use((req, res) => {
   });
 });
 
-// Глобальная обработка ошибок
 app.use((err, req, res, next) => {
-  console.error('🔥 Глобальная ошибка:', err);
+  console.error('Глобальная ошибка:', err);
   res.status(500).json({
     success: false,
     message: 'Внутренняя ошибка сервера',
@@ -45,16 +38,16 @@ app.use((err, req, res, next) => {
 // Запуск сервера
 app.listen(PORT, '0.0.0.0', () => {
   console.log(`
-🚀 Сервер запущен на порту ${PORT}
-🔗 Основные URL:
+Сервер запущен на порту ${PORT}
+Основные URL:
    http://localhost:${PORT}
    http://127.0.0.1:${PORT}
 
-📊 Проверить БД: http://localhost:${PORT}/api/check-db
-📝 Отзывы: http://localhost:${PORT}/api/reviews
-🔐 Админ панель: http://localhost:3000/admin
+Проверить БД: http://localhost:${PORT}/api/check-db
+Отзывы: http://localhost:${PORT}/api/reviews
+Админ панель: http://localhost:3000/admin
 
-👤 Админ данные (можно использовать любой вариант):
+Админ данные (можно использовать любой вариант):
    Вариант 1:
      Username/Email: daria
      Пароль: daria

@@ -6,15 +6,12 @@ const { authenticate } = require('../middleware/auth');
 // Вход в админку
 router.post('/api/admin/login', async (req, res) => {
   try {
-    console.log('🔐 Получены данные для входа:', req.body);
+    console.log('Получены данные для входа:', req.body);
     
-    // Получаем и username, и email, так как фронтенд может отправлять любое поле
     const { username, email, password } = req.body;
-    
-    // Определяем, что использовать для поиска пользователя
     const loginIdentifier = email || username;
     
-    console.log('🔐 Попытка входа с идентификатором:', loginIdentifier);
+    console.log('Попытка входа с идентификатором:', loginIdentifier);
     
     if (!loginIdentifier || !password) {
       return res.status(400).json({
@@ -22,15 +19,14 @@ router.post('/api/admin/login', async (req, res) => {
         message: 'Имя пользователя/email и пароль обязательны'
       });
     }
-    
-    // Ищем пользователя в БД по email или username
+
     const [users] = await pool.execute(
       'SELECT * FROM users WHERE email = ? OR username = ?',
       [loginIdentifier, loginIdentifier]
     );
     
     if (users.length === 0) {
-      console.log(`❌ Пользователь с идентификатором ${loginIdentifier} не найден`);
+      console.log(`Пользователь с идентификатором ${loginIdentifier} не найден`);
       return res.status(401).json({
         success: false,
         message: 'Неверные учетные данные'
@@ -38,10 +34,9 @@ router.post('/api/admin/login', async (req, res) => {
     }
     
     const user = users[0];
-    
-    // Проверяем, разрешен ли email для админки
+  
     if (!ALLOWED_ADMIN_EMAILS.includes(user.email)) {
-      console.log(`🚫 Попытка входа с неразрешенного email: ${user.email}`);
+      console.log(`Попытка входа с неразрешенного email: ${user.email}`);
       return res.status(403).json({
         success: false,
         message: 'Доступ запрещен. У вас нет прав для доступа к админке.'
@@ -60,7 +55,7 @@ router.post('/api/admin/login', async (req, res) => {
       
       const token = `admin_token_${tokenData}`;
       
-      console.log(`✅ Успешный вход: ${user.email}`);
+      console.log(`Успешный вход: ${user.email}`);
       
       res.json({
         success: true,
@@ -73,14 +68,14 @@ router.post('/api/admin/login', async (req, res) => {
         }
       });
     } else {
-      console.log(`❌ Неверный пароль для: ${user.email}`);
+      console.log(`Неверный пароль для: ${user.email}`);
       res.status(401).json({
         success: false,
         message: 'Неверные учетные данные'
       });
     }
   } catch (error) {
-    console.error('❌ Ошибка входа:', error);
+    console.error('Ошибка входа:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера'
@@ -91,7 +86,7 @@ router.post('/api/admin/login', async (req, res) => {
 // Получение статистики
 router.get('/api/admin/statistics', authenticate, async (req, res) => {
   try {
-    console.log('📊 Запрос статистики от:', req.user.email);
+    console.log('Запрос статистики от:', req.user.email);
     
     // Статистика по заявкам
     const [[bookingStats]] = await pool.execute(`
@@ -134,7 +129,7 @@ router.get('/api/admin/statistics', authenticate, async (req, res) => {
       }
     };
 
-    console.log('📊 Статистика:', statistics);
+    console.log('Статистика:', statistics);
     
     res.json({
       success: true,
@@ -142,7 +137,7 @@ router.get('/api/admin/statistics', authenticate, async (req, res) => {
       user: req.user // Возвращаем информацию о текущем пользователе
     });
   } catch (error) {
-    console.error('❌ Ошибка при получении статистики:', error);
+    console.error('Ошибка при получении статистики:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера'
@@ -190,7 +185,7 @@ router.get('/api/admin/bookings', authenticate, async (req, res) => {
       user: req.user
     });
   } catch (error) {
-    console.error('❌ Ошибка при получении заявок:', error);
+    console.error('Ошибка при получении заявок:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера'
@@ -201,7 +196,7 @@ router.get('/api/admin/bookings', authenticate, async (req, res) => {
 // Обновление статуса заявки
 router.put('/api/admin/bookings/:id/status', authenticate, async (req, res) => {
   try {
-    console.log(`🔄 Изменение статуса заявки #${req.params.id} от:`, req.user.email);
+    console.log(`Изменение статуса заявки #${req.params.id} от:`, req.user.email);
     
     const { id } = req.params;
     const { status } = req.body;
@@ -224,7 +219,7 @@ router.put('/api/admin/bookings/:id/status', authenticate, async (req, res) => {
       message: 'Статус заявки обновлен'
     });
   } catch (error) {
-    console.error('❌ Ошибка при обновлении статуса:', error);
+    console.error('Ошибка при обновлении статуса:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера'
@@ -235,7 +230,7 @@ router.put('/api/admin/bookings/:id/status', authenticate, async (req, res) => {
 // Удаление заявки
 router.delete('/api/admin/bookings/:id', authenticate, async (req, res) => {
   try {
-    console.log(`🗑️  Удаление заявки #${req.params.id} от:`, req.user.email);
+    console.log(`Удаление заявки #${req.params.id} от:`, req.user.email);
     
     const { id } = req.params;
     
@@ -246,7 +241,7 @@ router.delete('/api/admin/bookings/:id', authenticate, async (req, res) => {
       message: 'Заявка удалена'
     });
   } catch (error) {
-    console.error('❌ Ошибка при удалении заявки:', error);
+    console.error('Ошибка при удалении заявки:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера'
@@ -257,7 +252,7 @@ router.delete('/api/admin/bookings/:id', authenticate, async (req, res) => {
 // Получение отзывов (админ)
 router.get('/api/admin/reviews', authenticate, async (req, res) => {
   try {
-    console.log('📋 Запрос отзывов для админки от:', req.user.email);
+    console.log('Запрос отзывов для админки от:', req.user.email);
     
     const { page = 1, limit = 10, status } = req.query;
     const offset = (page - 1) * limit;
@@ -282,7 +277,7 @@ router.get('/api/admin/reviews', authenticate, async (req, res) => {
     const [reviews] = await pool.execute(query, params);
     const [[{ total }]] = await pool.execute(countQuery, countParams);
 
-    console.log(`📋 Найдено отзывов: ${reviews.length}`);
+    console.log(`Найдено отзывов: ${reviews.length}`);
     
     res.json({
       success: true,
@@ -298,7 +293,7 @@ router.get('/api/admin/reviews', authenticate, async (req, res) => {
       user: req.user
     });
   } catch (error) {
-    console.error('❌ Ошибка при получении отзывов:', error);
+    console.error('Ошибка при получении отзывов:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера'
@@ -309,12 +304,12 @@ router.get('/api/admin/reviews', authenticate, async (req, res) => {
 // Обновление статуса отзыва
 router.put('/api/admin/reviews/:id/status', authenticate, async (req, res) => {
   try {
-    console.log(`🔄 Изменение статуса отзыва #${req.params.id} от:`, req.user.email);
+    console.log(`Изменение статуса отзыва #${req.params.id} от:`, req.user.email);
     
     const { id } = req.params;
     const { status } = req.body;
 
-    console.log(`🔄 Изменение статуса отзыва #${id} на ${status}`);
+    console.log(`Изменение статуса отзыва #${id} на ${status}`);
 
     if (!['pending', 'approved', 'rejected'].includes(status)) {
       return res.status(400).json({
@@ -333,7 +328,7 @@ router.put('/api/admin/reviews/:id/status', authenticate, async (req, res) => {
       message: `Отзыв ${status === 'approved' ? 'одобрен' : 'отклонен'}`
     });
   } catch (error) {
-    console.error('❌ Ошибка при обновлении статуса:', error);
+    console.error('Ошибка при обновлении статуса:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера'
@@ -344,7 +339,7 @@ router.put('/api/admin/reviews/:id/status', authenticate, async (req, res) => {
 // Удаление отзыва
 router.delete('/api/admin/reviews/:id', authenticate, async (req, res) => {
   try {
-    console.log(`🗑️  Удаление отзыва #${req.params.id} от:`, req.user.email);
+    console.log(`Удаление отзыва #${req.params.id} от:`, req.user.email);
     
     const { id } = req.params;
     
@@ -355,7 +350,7 @@ router.delete('/api/admin/reviews/:id', authenticate, async (req, res) => {
       message: 'Отзыв удален'
     });
   } catch (error) {
-    console.error('❌ Ошибка при удалении отзыва:', error);
+    console.error('Ошибка при удалении отзыва:', error);
     res.status(500).json({
       success: false,
       message: 'Ошибка сервера'
