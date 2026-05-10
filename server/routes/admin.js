@@ -150,8 +150,10 @@ router.get('/api/admin/bookings', authenticate, async (req, res) => {
   try {
     console.log('📋 Запрос заявок от:', req.user.email);
     
-    const { page = 1, limit = 10, status } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
     const offset = (page - 1) * limit;
+    const { status } = req.query;
     
     let query = 'SELECT * FROM bookings';
     let countQuery = 'SELECT COUNT(*) as total FROM bookings';
@@ -166,7 +168,7 @@ router.get('/api/admin/bookings', authenticate, async (req, res) => {
     }
 
     query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
+    params.push(limit, offset);
 
     const [bookings] = await pool.execute(query, params);
     const [[{ total }]] = await pool.execute(countQuery, countParams);
@@ -176,9 +178,9 @@ router.get('/api/admin/bookings', authenticate, async (req, res) => {
       data: {
         bookings,
         pagination: {
-          total: parseInt(total),
-          page: parseInt(page),
-          limit: parseInt(limit),
+          total,
+          page,
+          limit,
           pages: Math.ceil(total / limit)
         }
       },
@@ -254,8 +256,10 @@ router.get('/api/admin/reviews', authenticate, async (req, res) => {
   try {
     console.log('Запрос отзывов для админки от:', req.user.email);
     
-    const { page = 1, limit = 10, status } = req.query;
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 10));
     const offset = (page - 1) * limit;
+    const { status } = req.query;
     
     console.log('📋 Запрос отзывов для админки:', { page, limit, status });
     
@@ -272,7 +276,7 @@ router.get('/api/admin/reviews', authenticate, async (req, res) => {
     }
 
     query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(parseInt(limit), parseInt(offset));
+    params.push(limit, offset);
 
     const [reviews] = await pool.execute(query, params);
     const [[{ total }]] = await pool.execute(countQuery, countParams);
@@ -284,9 +288,9 @@ router.get('/api/admin/reviews', authenticate, async (req, res) => {
       data: {
         reviews,
         pagination: {
-          total: parseInt(total),
-          page: parseInt(page),
-          limit: parseInt(limit),
+          total,
+          page,
+          limit,
           pages: Math.ceil(total / limit)
         }
       },
