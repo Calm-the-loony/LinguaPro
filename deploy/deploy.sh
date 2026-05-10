@@ -49,13 +49,13 @@ fi
 
 # Собираем и запускаем контейнеры
 echo -e "\n${YELLOW}Собираем и запускаем Docker контейнеры...${NC}"
-docker-compose build --no-cache server nginx
-docker-compose up -d
+docker compose build --no-cache server nginx
+docker compose up -d
 
 # Проверяем статус
 echo -e "\n${YELLOW}Проверяем статус контейнеров...${NC}"
 sleep 5
-docker-compose ps
+docker compose ps
 
 # Проверяем, что сервер отвечает
 echo -e "\n${YELLOW}Проверяем API...${NC}"
@@ -77,4 +77,4 @@ echo "Для получения SSL сертификата выполните:"
 echo "  ./deploy/renew-ssl.sh init"
 echo ""
 echo "Для просмотра логов:"
-echo "  docker-compose logs -f"
+echo "  docker compose logs -f"

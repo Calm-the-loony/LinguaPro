@@ -22,7 +22,7 @@ if [ "$ACTION" = "init" ]; then
     echo -e "\n${YELLOW}Запускаем nginx для валидации домена...${NC}"
 
     # Останавливаем основной compose если запущен
-    docker-compose down 2>/dev/null || true
+    docker compose down 2>/dev/null || true
 
     # Запускаем только nginx на 80 порту для получения сертификата
     docker run -d --rm --name temp-nginx \
@@ -64,7 +64,7 @@ EOF
 
     # Запускаем основной compose
     echo -e "\n${YELLOW}Запускаем проект с SSL...${NC}"
-    docker-compose up -d
+    docker compose up -d
 
     echo -e "\n${GREEN}========================================${NC}"
     echo -e "${GREEN}  SSL сертификат получен!${NC}"
@@ -80,8 +80,8 @@ elif [ "$ACTION" = "renew" ]; then
         certbot/certbot renew --quiet
 
     # Перезагружаем nginx, чтобы применить новые сертификаты
-    docker-compose exec nginx nginx -s reload 2>/dev/null || \
-        docker-compose restart nginx
+    docker compose exec nginx nginx -s reload 2>/dev/null || \
+        docker compose restart nginx
 
     echo -e "${GREEN}Сертификаты обновлены!${NC}"
 

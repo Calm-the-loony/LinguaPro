@@ -45,13 +45,15 @@ else
 fi
 
 # 3. Установка Docker Compose
-if ! command -v docker-compose &> /dev/null && ! docker compose version &> /dev/null; then
-    echo -e "\n${YELLOW}Устанавливаем Docker Compose...${NC}"
-    curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-    chmod +x /usr/local/bin/docker-compose
+if ! docker compose version &> /dev/null; then
+    echo -e "\n${YELLOW}Docker Compose plugin не найден. Устанавливаем...${NC}"
+    apt-get update -qq && apt-get install -y -qq docker-compose-plugin 2>/dev/null || {
+        curl -SL "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/lib/docker/cli-plugins/docker-compose
+        chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+    }
     echo -e "${GREEN}Docker Compose установлен${NC}"
 else
-    echo -e "${GREEN}Docker Compose уже установлен${NC}"
+    echo -e "${GREEN}Docker Compose уже установлен: $(docker compose version)${NC}"
 fi
 
 # 4. Создание папок для SSL
