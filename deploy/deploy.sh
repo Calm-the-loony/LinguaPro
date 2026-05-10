@@ -32,6 +32,12 @@ check_port() {
 check_port $HTTP_PORT
 check_port $HTTPS_PORT
 
+# Импорт БД, если есть дамп и флаг DB_INIT=true
+if [ "${DB_INIT}" = "true" ] && [ -f tutor_website.sql ]; then
+    echo -e "\n${YELLOW}Импортируем базу данных...${NC}"
+    bash deploy/init-db.sh "$DOMAIN" || echo -e "${YELLOW}Импорт БД пропущен${NC}"
+fi
+
 # Получаем последнюю версию с GitHub
 echo -e "\n${YELLOW}Обновляем код из репозитория...${NC}"
 if [ -d .git ]; then
