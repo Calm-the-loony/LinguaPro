@@ -49,8 +49,7 @@ fi
 
 # Собираем и запускаем контейнеры
 echo -e "\n${YELLOW}Собираем и запускаем Docker контейнеры...${NC}"
-docker-compose down --remove-orphans 2>/dev/null || true
-docker-compose build --no-cache
+docker-compose build --no-cache server nginx
 docker-compose up -d
 
 # Проверяем статус

@@ -65,13 +65,8 @@ if [ ! -f .env ]; then
 DOMAIN=$DOMAIN
 HTTP_PORT=$HTTP_PORT
 HTTPS_PORT=$HTTPS_PORT
+DB_PASSWORD=lingua_secret
 NODE_ENV=production
-PORT=5000
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=
-DB_NAME=tutor_website
-DB_PORT=3307
 EOF
     echo -e "${GREEN}.env файл создан${NC}"
 else
