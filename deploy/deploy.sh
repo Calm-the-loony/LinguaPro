@@ -10,33 +10,13 @@ echo -e "${GREEN}========================================${NC}"
 echo -e "${GREEN}  Деплой LinguaPro${NC}"
 echo -e "${GREEN}========================================${NC}"
 
-# Проверяем наличие .env
 if [ ! -f .env ]; then
     echo -e "${RED}.env файл не найден!${NC}"
     echo "Скопируйте .env.example в .env и настройте"
     exit 1
 fi
 
-# Загружаем переменные
 export $(grep -v '^#' .env | xargs)
-
-# Проверяем, свободны ли порты
-check_port() {
-    local port=$1
-    if ss -tuln 2>/dev/null | grep -q ":$port "; then
-        echo -e "${YELLOW}Порт $port уже используется. Проверьте настройки.${NC}"
-        return 0
-    fi
-}
-
-check_port $HTTP_PORT
-check_port $HTTPS_PORT
-
-# Импорт БД, если есть дамп и флаг DB_INIT=true
-if [ "${DB_INIT}" = "true" ] && [ -f tutor_website.sql ]; then
-    echo -e "\n${YELLOW}Импортируем базу данных...${NC}"
-    bash deploy/init-db.sh "$DOMAIN" || echo -e "${YELLOW}Импорт БД пропущен${NC}"
-fi
 
 # Получаем последнюю версию с GitHub
 echo -e "\n${YELLOW}Обновляем код из репозитория...${NC}"
@@ -57,24 +37,22 @@ echo -e "\n${YELLOW}Проверяем статус контейнеров...${N
 sleep 5
 docker compose ps
 
-# Проверяем, что сервер отвечает
-echo -e "\n${YELLOW}Проверяем API...${NC}"
-if curl -sf "http://localhost:$HTTP_PORT/" > /dev/null 2>&1; then
-    echo -e "${GREEN}Сайт отвечает!${NC}"
+# Проверяем, что наш Docker nginx отвечает
+echo -e "\n${YELLOW}Проверяем Docker nginx...${NC}"
+if curl -sf http://127.0.0.1:8081/ > /dev/null 2>&1; then
+    echo -e "${GREEN}Docker nginx отвечает на 127.0.0.1:8081${NC}"
 else
-    echo -e "${YELLOW}Сайт пока недоступен. Возможно, нужен SSL сертификат.${NC}"
-    echo "Запустите: ./deploy/renew-ssl.sh init"
+    echo -e "${RED}Docker nginx не отвечает. Смотрите логи: docker compose logs nginx${NC}"
 fi
 
 echo -e "\n${GREEN}========================================${NC}"
 echo -e "${GREEN}  Деплой завершен!${NC}"
 echo -e "${GREEN}========================================${NC}"
 echo ""
-echo "Сайт: http://$DOMAIN:$HTTP_PORT"
-echo "Админка: http://$DOMAIN:$HTTP_PORT/admin"
+echo "Docker nginx: http://127.0.0.1:8081"
 echo ""
-echo "Для получения SSL сертификата выполните:"
-echo "  ./deploy/renew-ssl.sh init"
+echo "Для настройки домена через host nginx выполните:"
+echo "  ./deploy/setup-domain.sh d24.clv-digital.tech"
 echo ""
 echo "Для просмотра логов:"
 echo "  docker compose logs -f"
