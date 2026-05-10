@@ -167,11 +167,10 @@ router.get('/api/admin/bookings', authenticate, async (req, res) => {
       countParams.push(status);
     }
 
-    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    query += ` ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
-    const [bookings] = await pool.execute(query, params);
-    const [[{ total }]] = await pool.execute(countQuery, countParams);
+    const [bookings] = await pool.query(query, params);
+    const [[{ total }]] = await pool.query(countQuery, countParams);
 
     res.json({
       success: true,
@@ -275,11 +274,10 @@ router.get('/api/admin/reviews', authenticate, async (req, res) => {
       countParams.push(status);
     }
 
-    query += ' ORDER BY created_at DESC LIMIT ? OFFSET ?';
-    params.push(limit, offset);
+    query += ` ORDER BY created_at DESC LIMIT ${limit} OFFSET ${offset}`;
 
-    const [reviews] = await pool.execute(query, params);
-    const [[{ total }]] = await pool.execute(countQuery, countParams);
+    const [reviews] = await pool.query(query, params);
+    const [[{ total }]] = await pool.query(countQuery, countParams);
 
     console.log(`Найдено отзывов: ${reviews.length}`);
     
